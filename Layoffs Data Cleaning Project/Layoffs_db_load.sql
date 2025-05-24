@@ -2,7 +2,7 @@
 
 SELECT * FROM layoffs;
 
--- Creating duplicate datset to make edits in
+-- Creating duplicate dataset to make edits in
 CREATE TABLE layoffs_staging
 LIKE layoffs;
 
