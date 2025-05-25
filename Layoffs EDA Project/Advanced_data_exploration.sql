@@ -108,3 +108,20 @@ SELECT
 FROM industry_year_rank
 GROUP BY industry
 ORDER BY avg_rank;
+
+
+-- Finding the total layoffs for a specific location
+DROP PROCEDURE IF EXISTS `location_layoffs`;
+
+DELIMITER $$
+CREATE PROCEDURE location_layoffs(location text)
+BEGIN
+	SELECT 
+		location,
+		SUM(total_laid_off) AS total_layoffs
+	FROM layoffs_staging2
+	GROUP BY location;
+END $$
+DELIMITER ;
+
+CALL location_layoffs('Karachi');

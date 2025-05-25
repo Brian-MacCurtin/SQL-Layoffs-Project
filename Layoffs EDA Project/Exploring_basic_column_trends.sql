@@ -12,6 +12,13 @@ SELECT
     max(funds_raised_millions) AS max_funds
 FROM layoffs_staging2;
 
+
+-- Total layoffs
+SELECT
+	SUM(total_laid_off) total_layoffs
+FROM layoffs_staging2;
+
+
 -- Companies with the most layoffs in a single day
 SELECT *
 FROM layoffs_staging2
@@ -88,11 +95,12 @@ LIMIT 15;
 
 -- Most layoffs per month
 SELECT
-    DATE_FORMAT(`date`, '%m/%Y') AS layoff_month,
+    SUBSTRING(`date`, 1, 7) AS layoff_month,
     sum(total_laid_off) AS total_layoffs
 FROM layoffs_staging2
-GROUP BY layoff_month
-ORDER BY total_layoffs DESC;
+WHERE SUBSTRING(`date`, 1, 7) IS NOT Null
+GROUP BY SUBSTRING(`date`, 1, 7)
+ORDER BY SUBSTRING(`date`, 1, 7) ASC;
 
 
 
