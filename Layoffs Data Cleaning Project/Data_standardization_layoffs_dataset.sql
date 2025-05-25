@@ -5,39 +5,39 @@ FROM layoffs_staging2;
 -- Changing 'Null' and blank strings to actually be Null
 UPDATE layoffs_staging2
 SET company = NULL 
-WHERE company = 'NULL' OR '';
+WHERE company = 'NULL' OR company = '';
 
 UPDATE layoffs_staging2
 SET location = NULL 
-WHERE location = 'NULL' OR '';
+WHERE location = 'NULL' OR location = '';
 
 UPDATE layoffs_staging2
 SET industry = NULL 
-WHERE industry = 'NULL' OR '';
+WHERE industry = 'NULL' OR industry = '';
 
 UPDATE layoffs_staging2
 SET total_laid_off = NULL 
-WHERE total_laid_off = 'NULL' OR '';
+WHERE total_laid_off = 'NULL' OR total_laid_off = '';
 
 UPDATE layoffs_staging2
 SET percentage_laid_off = NULL 
-WHERE percentage_laid_off = 'NULL' OR '';
+WHERE percentage_laid_off = 'NULL' OR percentage_laid_off = '';
 
 UPDATE layoffs_staging2
 SET `date` = NULL 
-WHERE `date` = 'NULL' OR '';
+WHERE `date` = 'NULL' OR `date` = '';
 
 UPDATE layoffs_staging2
 SET stage = NULL 
-WHERE stage = 'NULL' OR '';
+WHERE stage = 'NULL' OR stage = '';
 
 UPDATE layoffs_staging2
 SET country = NULL 
-WHERE country = 'NULL' OR '';
+WHERE country = 'NULL' OR country = '';
 
 UPDATE layoffs_staging2
 SET funds_raised_millions = NULL 
-WHERE funds_raised_millions = 'NULL' OR '';
+WHERE funds_raised_millions = 'NULL' OR funds_raised_millions = '';
 
 
 -- COMPANY: Removing whitespace from company names
