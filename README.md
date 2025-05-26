@@ -1,8 +1,10 @@
 # Project Overview
-This project took a look at layoff numbers from companies world-wide during the COVID pandemic. The dataset provided many descriptive columns regarding each company, as well as some numerical variables regarding the layoffs they had.
+This project took a look at layoff numbers from companies world-wide during the COVID pandemic. The dataset provided many descriptive columns regarding each company, as well as some numerical variables regarding the layoffs they had. 
+
+I mainly wanted to explore different trends related to the total amount of people laid off at a time for different companies and what percentage of the company was laid off.
 
 # Project Motivation
-The original dataset had many issues with it, so this project was designed to learn how to utilize SQL to clean the dataset, and then how to perform EDA on the dataset. This project also gave me hands-on experience working with MySQL and MySQLWorkbench
+The original dataset had many issues with it, so this project was designed to learn how to utilize SQL to clean the dataset, and then how to perform EDA on the dataset. This project also gave me hands-on experience working with MySQL and MySQLWorkbench.
 
 ## Tools I Used
 - SQL → Language used to query the database
@@ -104,14 +106,101 @@ SET company = TRIM(company);
 ```
 
 ### Combining Similar Information
+Next, I checked each variable to see if it had any redundant information as values. Any values containing similar information should be normalized.
 
+For example, every variation of *Crypto* can be combined into one singe industry.
+| Industry          |
+|-------------------|
+| Consumer          |
+| Crypto            |
+| Crypto Currency   |
+| CryptoCurrency    |
+| Data              |
+
+```SQL
+UPDATE layoffs_staging2
+SET industry = 'Crypto'
+WHERE industry LIKE 'CRYPTO%';
+```
+This normalizes all *Crypto* variations into one single industry.
+
+I also had to do the same thing for the *Country* column. Some rows of data listed the United States with a period at the end by accident. This code corrects that error:
+```SQL
+UPDATE layoffs_staging2
+SET country = 'United States'
+WHERE country LIKE 'United States%';
+```
 
 ### Correcting Data Types
+Finally, as mentioned earlier, all the data was read into the table in text format. In order to perform proper analysis on numerical variables they must be formatted as the right data type.
+```SQL
+ALTER TABLE layoffs_staging2
+MODIFY COLUMN total_laid_off INT DEFAULT NULL,
+MODIFY COLUMN percentage_laid_off decimal(5,4) DEFAULT NULL,
+MODIFY COLUMN funds_raised_millions INT DEFAULT NULL;
+```
 
+I also changed the *date* variable to the date format for future filtering and time series analysis 
+```SQL
+UPDATE layoffs_staging2
+SET `date` = str_to_date(`date`, '%m/%d/%Y');
 
+ALTER TABLE layoffs_staging2
+MODIFY COLUMN `date` DATE;
+```
 
 ## Null Evaluation
+The final step to data cleaning was dealing with null values in the dataset. 
+
+
+#### Qualitative Variables
+First, I looked at every column to see if it had null values in it. Of the qualitative variables, only *industry* had a handful of null values. To combat this issue, I ran a query that found all the company names that didn't have an industry listed. Then, I checked if that company had their industry listed in another entry in the dataset, as seen below:
+| data_row | company            | location      | industry      | total_laid_off | percentage_laid_off | date       | stage          | country         | funds_raised_millions |
+|----------|--------------------|---------------|----------------|----------------|----------------------|------------|----------------|------------------|------------------------|
+| 1        | Airbnb             | SF Bay Area   | *null*         | 30             | *null*               | 2023-03-03 | Post-IPO       | United States    | 6400                   |
+| 1        | Airbnb             | SF Bay Area   | Travel         | 1900           | 0.2500               | 2020-05-05 | Private Equity | United States    | 5400                   |
+| 1        | Bally's Interactive| Providence     | *null*         | *null*         | 0.1500               | 2023-01-18 | Post-IPO       | United States    | 946                    |
+| 1        | Carvana            | Phoenix        | *null*         | 2500           | 0.1200               | 2022-05-10 | Post-IPO       | United States    | 1600                   |
+| 1        | Carvana            | Phoenix        | Transportation | 1500           | 0.0800               | 2022-11-18 | Post-IPO       | United States    | 1600                   |
+| 1        | Carvana            | Phoenix        | Transportation | *null*         | *null*               | 2023-01-13 | Post-IPO       | United States    | 1600                   |
+| 1        | Juul               | SF Bay Area    | *null*         | 400            | 0.3000               | 2022-11-10 | Unknown        | United States    | 1500                   |
+| 1        | Juul               | SF Bay Area    | Consumer       | 900            | 0.3000               | 2020-05-05 | Unknown        | United States    | 1500                   |
+
+Three of the four companies that didn't have an industry listed in one row have their industry listed in another row. I used a self join to add a company's industry instead of the null.
+```SQL
+SELECT *
+FROM layoffs_staging2 t1
+JOIN layoffs_staging2 t2
+	ON t1.company = t2.company AND
+	   t1.location = t2.location
+WHERE 
+	t1.industry IS Null AND
+    t2.industry IS NOT Null;
+    
+UPDATE layoffs_staging2 t1
+JOIN layoffs_staging2 t2
+	ON t1.company = t2.company AND
+	   t1.location = t2.location
+SET t1.industry = t2.industry
+WHERE 
+	t1.industry IS Null AND
+    t2.industry IS NOT Null;
+```
+
+#### Quantitative Variables
+Of the three quantitative variables, I wanted to look at trends in the *total_laid_off* and *percentage_laid_off* columns in the EDA section, so any row that had nulls for **both** variables would be useless. 
+
+However, if a row had only one of these columns as null, since the other column contained helpful layoff information about the company, I would keep this row. Therefore, I only removed rows where *total_laid_off* and *percentage_laid_off* were null.
+```SQL
+DELETE
+FROM layoffs_staging2
+WHERE
+	total_laid_off IS Null AND
+    percentage_laid_off IS Null;
+```
 
 # Exploratory Data Analysis
+
+
 
 # Conclusion
