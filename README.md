@@ -200,7 +200,112 @@ WHERE
 ```
 
 # Exploratory Data Analysis
+After cleaning the data, exploratory data analysis is important to gauge different aspects of the data. Insights gained during EDA can be very influential during higher level analysis of the data.
+
+I first wanted to get a sense of the dates this data was collected between. 
+```SQL
+SELECT
+	min(`date`) AS earliest_date,
+    max(`date`) AS latest_date
+FROM layoffs_staging2;
+```
+| earliest_date | latest_date |
+|---------------|-------------|
+| 2020-03-11    | 2023-03-06  |
+
+I also wanted to explore some of the basic measures for the quantitative variables
+```SQL
+SELECT
+	'total_laid_off' AS column_name,
+	round(min(total_laid_off), 2) AS Minimum,
+	round(avg(total_laid_off), 2) AS Average,
+    round(max(total_laid_off), 2) AS Maximum
+FROM layoffs_staging2
+UNION ALL
+SELECT
+	'percentage_laid_off',
+	round(min(percentage_laid_off), 2),
+	round(avg(percentage_laid_off), 2),
+    round(max(percentage_laid_off), 2)
+FROM layoffs_staging2
+UNION ALL
+SELECT
+	'funds_raised_millions',
+	round(min(funds_raised_millions), 2),
+	round(avg(funds_raised_millions), 2),
+    round(max(funds_raised_millions), 2)
+FROM layoffs_staging2;
+```
+| Column_name         | Minimum | Average     | Maximum    |
+|---------------------|---------|-------------|------------|
+| total_laid_off      | 3.00  | 237.27| 12000.00 |
+| percentage_laid_off | 0.00  | 0.26  | 1.00     |
+| funds_raised_millions| 0.00 | 875.11| 121900.00|
+
+Next, I wanted to explore some of the *total_laid_off* trends. 
+
+#### Total Layoffs
+```SQL
+SELECT
+	SUM(total_laid_off) total_layoffs
+FROM layoffs_staging2;
+```
+| total_layoffs |
+|---------------|
+| 383,659       |
 
 
+#### Companies with Most Layoffs in a Single Day
+```SQL
+
+```
+
+
+#### Companies with Most Layoffs in Total
+```SQL
+
+```
+
+
+#### Companies with Most Rounds of Layoffs
+```SQL
+
+```
+
+
+#### Numbers of Companies That Went Completely Under
+```SQL
+
+```
+
+
+#### Top Funded Companies That Went Completely Under
+```SQL
+
+```
+
+
+#### Most Layoffs in One Day for Companies That Went Completely Under
+```SQL
+
+```
+
+
+#### Most Layoffs per Industry
+```SQL
+
+```
+
+
+#### Most Layoffs per Country
+```SQL
+
+```
+
+
+#### Most Layoffs per Location
+```SQL
+
+```
 
 # Conclusion
