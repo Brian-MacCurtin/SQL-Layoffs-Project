@@ -15,11 +15,11 @@ WHERE data_row > 1;
 SELECT *
 FROM layoffs_staging
 WHERE
-	company = 'Casper' OR
-    company = 'Cazoo' OR
-    company = 'Hibob' OR
-    company = 'Wildlife Studios' OR
-    company = 'Yahoo'
+	(company = 'Casper' AND `date` = '9/14/2021') OR
+    (company = 'Cazoo' AND `date` = '6/7/2022') OR
+    (company = 'Hibob' AND `date` = '3/30/2020') OR
+    (company = 'Wildlife Studios' AND `date` = '11/28/2022') OR
+    (company = 'Yahoo' AND `date` = '2/9/2023')
 ORDER BY company;
 
 
