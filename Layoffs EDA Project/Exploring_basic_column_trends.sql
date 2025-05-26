@@ -1,15 +1,31 @@
 -- EDA
 
--- Spread of numerical columns
+-- Date ranges
 SELECT
 	min(`date`) AS earliest_date,
-    max(`date`) AS latest_date,
-    min(total_laid_off) AS min_layoffs,
-    max(total_laid_off) AS max_layoffs,
-    min(percentage_laid_off) AS min_layoffs_percent,
-    max(percentage_laid_off) AS max_layoffs_percent,
-    min(funds_raised_millions) AS min_funds,
-    max(funds_raised_millions) AS max_funds
+    max(`date`) AS latest_date
+FROM layoffs_staging2;
+
+-- Numerical column measures
+SELECT
+	'total_laid_off' AS Column_name,
+	round(min(total_laid_off), 2) AS Minimum,
+	round(avg(total_laid_off), 2) AS Average,
+    round(max(total_laid_off), 2) AS Maximum
+FROM layoffs_staging2
+UNION ALL
+SELECT
+	'percentage_laid_off',
+	round(min(percentage_laid_off), 2),
+	round(avg(percentage_laid_off), 2),
+    round(max(percentage_laid_off), 2)
+FROM layoffs_staging2
+UNION ALL
+SELECT
+	'funds_raised_millions',
+	round(min(funds_raised_millions), 2),
+	round(avg(funds_raised_millions), 2),
+    round(max(funds_raised_millions), 2)
 FROM layoffs_staging2;
 
 
