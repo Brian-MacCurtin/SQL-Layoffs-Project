@@ -261,7 +261,7 @@ SELECT
 FROM layoffs_staging2;
 ```
 
-- There were 383,659 total layoffs recorded in this dataset during the 3-year period between March 11, 2020, and March 6, 2023.
+- There were 383,659 total layoffs recorded in this dataset during the 3-year period between March 11, 2020, and March 6, 2023. 
 
 #### Companies with Most Layoffs in a Single Day
 ```SQL
