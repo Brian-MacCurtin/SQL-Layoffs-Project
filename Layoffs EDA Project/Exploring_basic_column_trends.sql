@@ -122,6 +122,14 @@ GROUP BY SUBSTRING(`date`, 1, 7)
 ORDER BY SUBSTRING(`date`, 1, 7) ASC;
 
 
+-- Months with most layoffs
+SELECT
+	SUBSTRING(`date`, 1, 7) AS layoff_month,
+	sum(total_laid_off) AS total_layoffs
+FROM layoffs_staging2
+GROUP BY SUBSTRING(`date`, 1, 7)
+ORDER BY total_layoffs DESC
+LIMIT 5;
 
 -- Average layoff percentage per industry
 SELECT 
