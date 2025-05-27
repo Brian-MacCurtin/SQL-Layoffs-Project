@@ -1,10 +1,10 @@
 # Project Overview
 This project took a look at layoff numbers from companies world-wide during the COVID pandemic. The dataset provided many descriptive columns regarding each company, as well as some numerical variables regarding the layoffs they had. 
 
-I mainly wanted to explore different trends related to the total amount of people laid off at a time for different companies and what percentage of the company was laid off.
+I mainly wanted to explore different trends related to the total number of people laid off at a time for different companies and what percentage of the company was laid off.
 
 # Project Motivation
-The original dataset had many issues with it, so this project was designed to learn how to utilize SQL to clean the dataset, and then how to perform EDA on the dataset. This project also gave me hands-on experience working with MySQL and MySQLWorkbench.
+The original dataset had many issues with it, so this project was designed to learn how to utilize SQL to clean the dataset. The SQL queries for this can be found here: [SQL Layoffs Data Cleaning](/Layoffs%20Data%20Cleaning%20Project/). The second goal of this project was to learn how to perform EDA on the cleaned dataset. The SQL queries for this portion of the project can be found here: [SQL Layoffs EDA](/Layoffs%20EDA%20Project/). This project also gave me hands-on experience working with MySQL and MySQLWorkbench.
 
 ## Tools I Used
 - SQL → Language used to query the database
@@ -21,17 +21,16 @@ The original dataset had many issues with it, so this project was designed to le
 - Subqueries and CTEs
 
 ## SQL Techniques I Learned
-- Optimal data cleaning practices including:
-    - Making edits on a staging dataset
-    - Removing duplicates
-    - Data standardization
-    - Dealing with nulls
+- Optimal data cleaning practices in SQL
 - Window Functions
 - Stored Procedures and Parameters
 - Triggers and Events
 
 # Data Cleaning
-EXPLANATION HERE
+If you take just one quick look at this dataset, you can already identify several clear issues with the data. It is important to correct these issues so that findings during the analysis of data aren't incorrect or flawed. Some things I did to clean the data are: 
+- Removing duplicates
+- Data standardization
+- Null evaluations
 
 ## Removing Duplicates
 The first step of the data cleaning process was to remove any rows that contained duplicated information, as these rows are redundant. 
@@ -86,7 +85,7 @@ ORDER BY company;
 As we can see, there are 5 duplicated rows that must be deleted
 
 ## Data Standardization
-The next step is to standardize the data, so we don't run into any issues when preforming EDA or analysis.
+The next step is to standardize the data, so we don't run into any issues when performing EDA or analysis.
 
 ### Null and Blank Value Formatting
 The first thing I did was dealing with null and blank values that appeared in the dataset. When the dataset was loaded into *MySQLWorkbench*, every column was read in **text** format. This means that every value in the dataset also was read in as text, including numerical values and nulls. 
@@ -108,7 +107,7 @@ SET company = TRIM(company);
 ### Combining Similar Information
 Next, I checked each variable to see if it had any redundant information as values. Any values containing similar information should be normalized.
 
-For example, every variation of *Crypto* can be combined into one singe industry.
+For example, every variation of *Crypto* can be combined into one single industry.
 | Industry          |
 |-------------------|
 | Consumer          |
@@ -286,7 +285,7 @@ LIMIT 10;
 
 - The top three companies that experienced the most layoffs in a single day, Google, Meta and Amazon are some of the biggest and most well-known companies in the world.
 
-- Amazon had two days when they experience a large amount of layoffs.
+- Amazon had two days when they experienced a large amount of layoffs.
 
 - Six of the companies are from the US, two are from the Netherlands, followed by one from Sweden.
 
@@ -342,7 +341,7 @@ LIMIT 10;
 | Salesforce  | 4              |
 | Patreon     | 4              |
 
-- Loft lead the way with the most layoff rounds with 6, the only company to have that many.
+- Loft led the way with the most layoff rounds with 6, the only company to have that many.
 
 - Only Uber and Salesforce appeared in the top 10 total layoffs.
 
@@ -353,7 +352,7 @@ FROM layoffs_staging2
 WHERE percentage_laid_off = 1;
 ```
 
-There were companies 116 companies that laid off 100% of their employees, meaning they went under.
+There were 116 companies that laid off 100% of their employees, meaning they went under.
 
 #### Top Funded Companies That Went Completely Under
 ```SQL
@@ -507,7 +506,7 @@ LIMIT 15;
 
 #### Total Layoffs for Any Location
 
-The final query I wrote for exploring the *total_laid_off* variable was to return the total layoffs for any specific location. I created a procedure that could be called with any location and would return that locations total layoffs. In this example, I looked at the total layoffs in Karachi, Pakistan.
+The final query I wrote for exploring the *total_laid_off* variable was to return the total layoffs for any specific location. I created a procedure that could be called with any location and would return that location's total layoffs. In this example, I looked at the total layoffs in Karachi, Pakistan.
 ```SQL
 DROP PROCEDURE IF EXISTS `location_layoffs`;
 
@@ -682,11 +681,11 @@ WHERE layoff_rank <= 5;
 | 4    | Salesforce   | 8,000          |
 | 5    | Dell         | 6,650          |
 
-- There are some extremely well-know companies that were among the most layoffs in each year.
+- There are some extremely well-known companies that had the most layoffs in each year.
 
 - Only Amazon appears in two separate years.
 
-- As we saw earlier, 2021 had the least amount of layoffs, so top five total layoff companies had significantly fewer total layoffs compared to other years.
+- As we saw earlier, 2021 had the least amount of layoffs, so the top five total layoff companies had significantly fewer total layoffs compared to other years.
 
 #### Layoffs per Year by Industry
 ```SQL
@@ -753,3 +752,4 @@ WHERE layoff_rank <= 5;
 - The consumer and retail industries saw significant layoffs in three separate years
 
 # Conclusion
+This project helped me build on some of the SQL skills I knew, as well as introducing some new techniques. On top of this, I've become more experienced in how to clean a dataset, so it can be used for EDA and analysis. In the EDA section of this project, I practiced writing queries that helped me understand some overall trends in the data. I learned which companies and which industries were hit hardest in terms of layoffs by the COVID pandemic.
