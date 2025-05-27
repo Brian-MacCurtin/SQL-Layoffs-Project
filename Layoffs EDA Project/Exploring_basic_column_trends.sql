@@ -112,7 +112,7 @@ ORDER BY total_layoffs DESC
 LIMIT 15; 
 
 
--- Most layoffs per month
+-- Layoffs per month
 SELECT
     SUBSTRING(`date`, 1, 7) AS layoff_month,
     sum(total_laid_off) AS total_layoffs
