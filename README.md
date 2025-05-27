@@ -206,7 +206,7 @@ Some things I went to explore were:
 - Measures of spread for quantitative variables
 - Trends related to the *total_laid_off* variable
 - Layoffs over time
-- PUT SOMETHING HER GhEOINVKTIHEKLNVPHTWKE
+- Layoff rankings per year for different columns
 
 ## Spread of Quantitative Variables
 First, I wanted to get a sense of the dates this data was collected between. 
@@ -505,10 +505,251 @@ LIMIT 15;
 
 - All the cities on this list are located in one of the countries that appeared in the top 15 layoffs per country
 
+#### Total Layoffs for Any Location
+
+The final query I wrote for exploring the *total_laid_off* variable was to return the total layoffs for any specific location. I created a procedure that could be called with any location and would return that locations total layoffs. In this example, I looked at the total layoffs in Karachi, Pakistan.
+```SQL
+DROP PROCEDURE IF EXISTS `location_layoffs`;
+
+DELIMITER $$
+CREATE PROCEDURE location_layoffs(location text)
+BEGIN
+	SELECT 
+		location,
+		SUM(total_laid_off) AS total_layoffs
+	FROM layoffs_staging2
+	GROUP BY location;
+END $$
+DELIMITER ;
+
+CALL location_layoffs('Karachi');
+```
+| Location | Total Layoffs |
+|----------|---------------|
+| Karachi  | 383,659       |
+
 ## Layoffs over Time
 
+#### Months with Most Layoffs
+```SQL
+SELECT
+	SUBSTRING(`date`, 1, 7) AS layoff_month,
+	sum(total_laid_off) AS total_layoffs
+FROM layoffs_staging2
+GROUP BY SUBSTRING(`date`, 1, 7)
+ORDER BY total_layoffs DESC
+LIMIT 5;
+```
+| Layoff Month | Total Layoffs |
+|--------------|----------------|
+| 2023-01      | 84,714         |
+| 2022-11      | 53,451         |
+| 2023-02      | 36,493         |
+| 2020-04      | 26,710         |
+| 2020-05      | 25,804         |
 
-## PUT SOMETHING HERE GHIOREKNLVHTOVENLKBHTKWNLVIPHKNV
+- The months at the start of the pandemic are among the top in terms of most layoffs.
 
+- Months around the end of this dataset are also included.
+
+#### Rolling Total of Layoffs for 2020
+```SQL
+WITH layoffs_per_month AS (
+	SELECT
+		SUBSTRING(`date`, 1, 7) AS layoff_month,
+		SUM(total_laid_off) AS total_layoffs
+	FROM layoffs_staging2
+	WHERE SUBSTRING(`date`, 1, 7) IS NOT Null
+	GROUP BY SUBSTRING(`date`, 1, 7)	
+)
+SELECT 
+	layoff_month,
+    total_layoffs,
+	SUM(total_layoffs) OVER(ORDER BY layoff_month) AS Rolling_total
+FROM layoffs_per_month
+ORDER BY layoff_month ASC;
+```
+| Layoff Month | Total Layoffs | Rolling Total |
+|--------------|----------------|----------------|
+| 2020-03      | 9,628          | 9,628          |
+| 2020-04      | 26,710         | 36,338         |
+| 2020-05      | 25,804         | 62,142         |
+| 2020-06      | 7,627          | 69,769         |
+| 2020-07      | 7,112          | 76,881         |
+| 2020-08      | 1,969          | 78,850         |
+| 2020-09      | 609            | 79,459         |
+| 2020-10      | 450            | 79,909         |
+| 2020-11      | 237            | 80,146         |
+| 2020-12      | 852            | 80,998         |
+
+- There were 80998 layoffs due to the pandemic that this dataset tracked.
+
+- The early months of 2020 contributed most to the total layoffs.
+
+- There were fewer layoffs during the holidays towards the end of the year.
+
+#### Rolling Total of Layoffs per Year
+```SQL
+WITH layoffs_per_year AS (
+	SELECT
+		SUBSTRING(`date`, 1, 4) AS layoff_year,
+		SUM(total_laid_off) AS total_layoffs
+	FROM layoffs_staging2
+	WHERE SUBSTRING(`date`, 1, 4) IS NOT Null
+	GROUP BY SUBSTRING(`date`, 1, 4)	
+)
+SELECT 
+	layoff_year,
+    total_layoffs,
+	SUM(total_layoffs) OVER(ORDER BY layoff_year) AS Rolling_total
+FROM layoffs_per_year
+ORDER BY layoff_year ASC;
+```
+| Layoff Year | Total Layoffs | Rolling Total |
+|-------------|----------------|----------------|
+| 2020        | 80,998         | 80,998         |
+| 2021        | 15,823         | 96,821         |
+| 2022        | 160,661        | 257,482        |
+| 2023        | 125,677        | 383,159        |
+
+- There were significantly fewer layoffs in 2021 compared to the other years.
+
+- 2022 had the most layoffs.
+
+- Layoffs didn't necessarily increase or decrease throughout the years.
+
+## Layoff Rankings per Year for Different Columns
+
+#### Layoffs per Year by Company
+```SQL
+WITH layoffs_per_company AS (
+	SELECT
+		company,
+		YEAR(`date`) as `year`,
+		SUM(total_laid_off) AS total_layoffs
+	FROM layoffs_staging2
+	WHERE YEAR(`date`) IS NOT Null
+	GROUP BY company, YEAR(`date`)	
+),
+company_year_rank AS(
+	SELECT 
+		company,
+		`year`,
+		total_layoffs,
+		DENSE_RANK() OVER(PARTITION BY `year` ORDER BY total_layoffs DESC) AS layoff_rank
+	FROM layoffs_per_company
+	ORDER BY `year`, layoff_rank ASC
+)
+SELECT *
+FROM company_year_rank
+WHERE layoff_rank <= 5;
+```
+##### 2020
+| Rank | Company      | Total Layoffs |
+|------|--------------|----------------|
+| 1    | Uber         | 7,525          |
+| 2    | Booking.com  | 4,375          |
+| 3    | Groupon      | 2,800          |
+| 4    | Swiggy       | 2,250          |
+| 5    | Airbnb       | 1,900          |
+
+##### 2021
+| Rank | Company      | Total Layoffs |
+|------|--------------|----------------|
+| 1    | Bytedance    | 3,600          |
+| 2    | Katerra      | 2,434          |
+| 3    | Zillow       | 2,000          |
+| 4    | Instacart    | 1,877          |
+| 5    | WhiteHat Jr  | 1,800          |
+
+##### 2022
+| Rank | Company      | Total Layoffs |
+|------|--------------|----------------|
+| 1    | Meta         | 11,000         |
+| 2    | Amazon       | 10,150         |
+| 3    | Cisco        | 4,100          |
+| 4    | Peloton      | 4,084          |
+| 5    | Carvana      | 4,000          |
+| 5    | Philips      | 4,000          |
+
+##### 2023
+| Rank | Company      | Total Layoffs |
+|------|--------------|----------------|
+| 1    | Google       | 12,000         |
+| 2    | Microsoft    | 10,000         |
+| 3    | Ericsson     | 8,500          |
+| 4    | Amazon       | 8,000          |
+| 4    | Salesforce   | 8,000          |
+| 5    | Dell         | 6,650          |
+
+- There are some extremely well-know companies that were among the most layoffs in each year.
+
+- Only Amazon appears in two separate years.
+
+- As we saw earlier, 2021 had the least amount of layoffs, so top five total layoff companies had significantly fewer total layoffs compared to other years.
+
+#### Layoffs per Year by Industry
+```SQL
+WITH layoffs_per_industry AS (
+	SELECT
+		industry,
+		YEAR(`date`) as `year`,
+		SUM(total_laid_off) AS total_layoffs
+	FROM layoffs_staging2
+	WHERE YEAR(`date`) IS NOT Null
+	GROUP BY industry, YEAR(`date`)	
+),
+industry_year_rank AS(
+	SELECT 
+		industry,
+		`year`,
+		total_layoffs,
+		DENSE_RANK() OVER(PARTITION BY `year` ORDER BY total_layoffs DESC) AS layoff_rank
+	FROM layoffs_per_industry
+	ORDER BY `year`, layoff_rank ASC
+)
+SELECT *
+FROM industry_year_rank
+WHERE layoff_rank <= 5;
+```
+##### 2020
+| Rank | Industry       | Total Layoffs |
+|------|----------------|----------------|
+| 1    | Transportation | 14,656         |
+| 2    | Travel         | 13,983         |
+| 3    | Finance        | 8,624          |
+| 4    | Retail         | 8,002          |
+| 5    | Food           | 6,218          |
+
+##### 2021
+| Rank | Industry      | Total Layoffs |
+|------|---------------|----------------|
+| 1    | Consumer      | 3,600          |
+| 2    | Real Estate   | 2,900          |
+| 3    | Food          | 2,644          |
+| 4    | Construction  | 2,434          |
+| 5    | Education     | 1,943          |
+
+##### 2022
+| Rank | Industry       | Total Layoffs |
+|------|----------------|----------------|
+| 1    | Retail         | 20,914         |
+| 2    | Consumer       | 19,856         |
+| 3    | Transportation | 15,227         |
+| 4    | Healthcare     | 15,058         |
+| 5    | Finance        | 12,684         |
+
+##### 2023
+| Rank | Industry   | Total Layoffs |
+|------|------------|----------------|
+| 1    | Other      | 28,512         |
+| 2    | Consumer   | 15,663         |
+| 3    | Retail     | 13,609         |
+| 4    | Hardware   | 13,223         |
+| 5    | Healthcare | 9,770          |
+
+- No industry appears in all four years
+
+- The consumer and retail industries saw significant layoffs in three separate years
 
 # Conclusion
