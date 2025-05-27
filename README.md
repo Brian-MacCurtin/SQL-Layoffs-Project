@@ -1,14 +1,14 @@
 # Project Overview
-This project took a look at layoff numbers from companies world-wide during the COVID pandemic. The dataset provided many descriptive columns regarding each company, as well as some numerical variables regarding the layoffs they had. 
+This project looked at layoff numbers from companies world-wide during the COVID pandemic. The dataset provided many descriptive columns that described each company, as well as some numerical variables regarding the layoffs they had. 
 
-I mainly wanted to explore different trends related to the total number of people laid off at a time for different companies and what percentage of the company was laid off.
+I mainly wanted to explore different trends related to the total number of people laid off at a time for different companies.
 
 # Project Motivation
 The original dataset had many issues with it, so this project was designed to learn how to utilize SQL to clean the dataset. The SQL queries for this can be found here: [SQL Layoffs Data Cleaning](/Layoffs%20Data%20Cleaning%20Project/). The second goal of this project was to learn how to perform EDA on the cleaned dataset. The SQL queries for this portion of the project can be found here: [SQL Layoffs EDA](/Layoffs%20EDA%20Project/). This project also gave me hands-on experience working with MySQL and MySQLWorkbench.
 
 ## Tools I Used
 - SQL → Language used to query the database
-- MySQL → Database used to store data
+- MySQL → Database used to store the data
 - MySQLWorkbench → Platform used to write SQL queries
 - Git/Github → Tracks code updates and used for presentation
 - Markdown → Used to write this report
@@ -27,10 +27,10 @@ The original dataset had many issues with it, so this project was designed to le
 - Triggers and Events
 
 # Data Cleaning
-If you take just one quick look at this dataset, you can already identify several clear issues with the data. It is important to correct these issues so that findings during the analysis of data aren't incorrect or flawed. Some things I did to clean the data are: 
-- Removing duplicates
+If you take just one quick look at this dataset, you can already identify several clear issues with the data. It is important to correct these issues so that findings during the analysis of data aren't flawed or incorrect. Some things I did to clean the data are: 
+- Remove duplicates
 - Data standardization
-- Null evaluations
+- Null evaluation
 
 ## Removing Duplicates
 The first step of the data cleaning process was to remove any rows that contained duplicated information, as these rows are redundant. 
@@ -82,15 +82,15 @@ ORDER BY company;
 | Yahoo            | SF Bay Area    | Consumer      | 1600           | 0.2         | 2/9/2023   | Acquired | United States    | 6                 |
 | Yahoo            | SF Bay Area    | Consumer      | 1600           | 0.2         | 2/9/2023   | Acquired | United States    | 6                 |
 
-As we can see, there are 5 duplicated rows that must be deleted
+As we can see, there are 5 duplicated rows that must be deleted.
 
 ## Data Standardization
 The next step is to standardize the data, so we don't run into any issues when performing EDA or analysis.
 
 ### Null and Blank Value Formatting
-The first thing I did was dealing with null and blank values that appeared in the dataset. When the dataset was loaded into *MySQLWorkbench*, every column was read in **text** format. This means that every value in the dataset also was read in as text, including numerical values and nulls. 
+The first thing I looked at was null and blank values that appeared in the dataset. When the dataset was loaded into *MySQLWorkbench*, every column was read in **text** format. This means that every value in the dataset also was read in as **text**, including numerical values and nulls. 
 
-Entries that have the word "null" must be changed to the proper format for nulls. I also changed blank values to appear as nulls. The code below shows an example of the changes that were made for one column:
+Data entries that inaccurately have the word "null" must be changed to the proper format for nulls. I also changed blank values to appear as nulls. The code below shows an example of the changes that were made for one column:
 ```SQL
 UPDATE layoffs_staging2
 SET company = NULL 
@@ -123,7 +123,7 @@ WHERE industry LIKE 'CRYPTO%';
 ```
 This normalizes all *Crypto* variations into one single industry.
 
-I also had to do the same thing for the *Country* column. Some rows of data listed the United States with a period at the end by accident. This code corrects that error:
+I also had to do the same thing for the *Country* column. Some rows of data accidentally listed the United States with a period at the end.
 ```SQL
 UPDATE layoffs_staging2
 SET country = 'United States'
@@ -131,7 +131,7 @@ WHERE country LIKE 'United States%';
 ```
 
 ### Correcting Data Types
-Finally, as mentioned earlier, all the data was read into the table in text format. In order to perform proper analysis on numerical variables they must be formatted as the right data type.
+Finally, as mentioned earlier, all the data was read into the table in text format. In order to perform proper analysis on numerical variables, they must be formatted consistently with numerical data types.
 ```SQL
 ALTER TABLE layoffs_staging2
 MODIFY COLUMN total_laid_off INT DEFAULT NULL,
@@ -165,7 +165,7 @@ First, I looked at every column to see if it had null values in it. Of the quali
 | 1        | Juul               | SF Bay Area    | *null*         | 400            | 0.3000               | 2022-11-10 | Unknown        | United States    | 1500                   |
 | 1        | Juul               | SF Bay Area    | Consumer       | 900            | 0.3000               | 2020-05-05 | Unknown        | United States    | 1500                   |
 
-Three of the four companies that didn't have an industry listed in one row have their industry listed in another row. I used a self join to add a company's industry instead of the null.
+Three of the four companies that didn't have an industry listed in one row, have their industry listed in another row. I used a self join to add the company's industry.
 ```SQL
 SELECT *
 FROM layoffs_staging2 t1
@@ -187,9 +187,9 @@ WHERE
 ```
 
 #### Quantitative Variables
-Of the three quantitative variables, I wanted to look at trends in the *total_laid_off* and *percentage_laid_off* columns in the EDA section, so any row that had nulls for **both** variables would be useless. 
+Of the three quantitative variables, I wanted to look at trends in the *total_laid_off* and *percentage_laid_off* columns in the EDA section. This means that any rows that had nulls for **both** variables would be useless. 
 
-However, if a row had only one of these columns as null, since the other column contained helpful layoff information about the company, I would keep this row. Therefore, I only removed rows where *total_laid_off* and *percentage_laid_off* were null.
+However, if a row had only one of these columns as null, since the other column contained helpful layoff information about the company, I would keep this row. Therefore, I only removed rows where *total_laid_off* **and** *percentage_laid_off* were null.
 ```SQL
 DELETE
 FROM layoffs_staging2
@@ -219,7 +219,7 @@ FROM layoffs_staging2;
 |---------------|-------------|
 | 2020-03-11    | 2023-03-06  |
 
-I then explored some of the basic measures for the quantitative variables
+I then explored some of the basic measures for the quantitative variables:
 ```SQL
 SELECT
 	'total_laid_off' AS column_name,
@@ -283,11 +283,11 @@ LIMIT 10;
 | Philips       | Amsterdam     | Healthcare | 6,000          | 0.1300     | 2023-01-30 | Post-IPO  | Netherlands     | *(null)*          |
 | Booking.com   | Amsterdam     | Travel     | 4,375          | 0.2500     | 2020-07-30 | Acquired  | Netherlands     | *(null)*          |
 
-- The top three companies that experienced the most layoffs in a single day, Google, Meta and Amazon are some of the biggest and most well-known companies in the world.
+- The top three companies that experienced the most layoffs in a single day, Google, Meta and Amazon, are some of the biggest and most well-known companies in the world.
 
 - Amazon had two days when they experienced a large amount of layoffs.
 
-- Six of the companies are from the US, two are from the Netherlands, followed by one from Sweden.
+- Six of the companies are from the US, two are from the Netherlands, and one is from Sweden.
 
 - Every company is in the Post-IPO stage except for Booking.com.
 
@@ -352,7 +352,7 @@ FROM layoffs_staging2
 WHERE percentage_laid_off = 1;
 ```
 
-There were 116 companies that laid off 100% of their employees, meaning they went under.
+- There were 116 companies that laid off 100% of their employees, meaning they went under.
 
 #### Top Funded Companies That Went Completely Under
 ```SQL
@@ -404,7 +404,7 @@ LIMIT 10;
 
 - Katerra had the most people laid off at a single time for companies that went under at a staggering 2434 employees.
 
-- The top four companies in this table are from New York City and San Francisco
+- The top four companies in this table are from New York City and San Francisco.
 
 #### Most Layoffs per Industry
 ```SQL
@@ -436,7 +436,7 @@ LIMIT 15;
 
 - The industries hit the heaviest by the pandemic had jobs that mainly required face-to-face interactions.
 
-- Many jobs weren't classified into one of the named industries from the dataset and can be found under *Other*
+- Many jobs weren't classified into one of the named industries from the dataset and can be found under *Other*.
 
 #### Most Layoffs per Country
 ```SQL
@@ -468,7 +468,7 @@ LIMIT 15;
 
 - The US had more than seven times more layoffs than India, which had the second most layoffs.
 
-- Many of the most populous countries experienced high amounts of layoffs
+- Many of the most populous countries in the world experienced high amounts of layoffs
 
 - Surprisingly, some relatively smaller countries, like the Netherlands, Sweden, Israel, and the UAE, appeared on this list
 
@@ -502,7 +502,7 @@ LIMIT 15;
 
 - San Francisco experienced the most total layoffs with more than three times the amount of layoffs in Seattle.
 
-- All the cities on this list are located in one of the countries that appeared in the top 15 layoffs per country
+- All the cities on this list are located in one of the countries that appeared in the top 15 layoffs per country.
 
 #### Total Layoffs for Any Location
 
@@ -581,11 +581,11 @@ ORDER BY layoff_month ASC;
 | 2020-11      | 237            | 80,146         |
 | 2020-12      | 852            | 80,998         |
 
-- There were 80998 layoffs due to the pandemic that this dataset tracked.
+- There were 80998 layoffs in 2020 that this dataset tracked.
 
-- The early months of 2020 contributed most to the total layoffs.
+- The early months of 2020 contributed most to the year's total layoffs.
 
-- There were fewer layoffs during the holidays towards the end of the year.
+- There were fewer layoffs during the holiday times the end of the year.
 
 #### Rolling Total of Layoffs per Year
 ```SQL
@@ -685,7 +685,7 @@ WHERE layoff_rank <= 5;
 
 - Only Amazon appears in two separate years.
 
-- As we saw earlier, 2021 had the least amount of layoffs, so the top five total layoff companies had significantly fewer total layoffs compared to other years.
+- As we saw earlier, 2021 had the least amount of layoffs, so the top five total layoff companies had significantly fewer total layoffs compared to other year's top five.
 
 #### Layoffs per Year by Industry
 ```SQL
@@ -747,9 +747,9 @@ WHERE layoff_rank <= 5;
 | 4    | Hardware   | 13,223         |
 | 5    | Healthcare | 9,770          |
 
-- No industry appears in all four years
+- No industry appeared in all four years
 
-- The consumer and retail industries saw significant layoffs in three separate years
+- The consumer and retail industries saw significant layoffs in three separate years.
 
 # Conclusion
-This project helped me build on some of the SQL skills I knew, as well as introducing some new techniques. On top of this, I've become more experienced in how to clean a dataset, so it can be used for EDA and analysis. In the EDA section of this project, I practiced writing queries that helped me understand some overall trends in the data. I learned which companies and which industries were hit hardest in terms of layoffs by the COVID pandemic.
+This project helped me build on some of the SQL skills I knew, as well as introducing some new techniques. On top of this, I've become more experienced in cleaning a datase for later EDA and analysis. In the EDA section of this project, I practiced writing queries that helped me understand some overall trends in the data. I learned which companies and which industries were hit hardest in terms of layoffs by the COVID pandemic.
