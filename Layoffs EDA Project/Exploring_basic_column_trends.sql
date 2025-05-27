@@ -8,24 +8,27 @@ FROM layoffs_staging2;
 
 -- Numerical column measures
 SELECT
-	'total_laid_off' AS Column_name,
+	'total_laid_off' AS column_name,
 	round(min(total_laid_off), 2) AS Minimum,
 	round(avg(total_laid_off), 2) AS Average,
-    round(max(total_laid_off), 2) AS Maximum
+    round(max(total_laid_off), 2) AS Maximum,
+	round(stddev_samp(total_laid_off), 2) AS Standard_Deviation
 FROM layoffs_staging2
 UNION ALL
 SELECT
 	'percentage_laid_off',
 	round(min(percentage_laid_off), 2),
 	round(avg(percentage_laid_off), 2),
-    round(max(percentage_laid_off), 2)
+    round(max(percentage_laid_off), 2),
+	round(stddev_samp(percentage_laid_off), 2)
 FROM layoffs_staging2
 UNION ALL
 SELECT
 	'funds_raised_millions',
 	round(min(funds_raised_millions), 2),
 	round(avg(funds_raised_millions), 2),
-    round(max(funds_raised_millions), 2)
+    round(max(funds_raised_millions), 2),
+	round(stddev_samp(funds_raised_millions), 2)
 FROM layoffs_staging2;
 
 
